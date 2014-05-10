@@ -1,0 +1,41 @@
+{
+  "name": "grunt-vc-ios",
+  "description": "Updates ios info.plist and changes application version. written for environments where plistbuddy is to available'",
+  "version": "0.0.1",
+  "homepage": "https://github.com/rajatpandit/grunt-vc-ios",
+  "author": {
+    "name": "Rajat Pandit",
+    "email": "rp@rajatpandit.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rajatpandit/grunt-vc-ios.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rajatpandit/grunt-vc-ios/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/rajatpandit/grunt-vc-ios/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "grunt": "~0.4.4"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.4"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}
