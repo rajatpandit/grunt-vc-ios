@@ -35,6 +35,14 @@ grunt.initConfig({
 });
 ```
 ### Usage Examples
+```bash
+> grunt ios:Info.plist:patch
+Running "ios:Info.plist:patch" (ios) task
+Called from the ios task
+Current version: 0.0.4
+Updating version to 0.0.5
+```
+Check out documentation for semver  to see the options that can be passed
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
