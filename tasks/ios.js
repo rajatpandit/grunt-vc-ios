@@ -52,15 +52,22 @@ module.exports = function(grunt) {
         var valid_bump_type = ['major', 'minor', 'patch', 'prerelease'];
         valid_bump_type.contains(bump_type, function(found) {
             if (true === found) {
-                grunt.log.writeln('bump_type: %s, version: %s', bump_type, result);
                 result = result.toString(); // convert this into a string value to keep semver happy
                 if (semver.valid(result)) {
                     new_version = semver.inc(result, bump_type);
                     grunt.log.writeln('Updating version to %s', new_version);
                     // update the file with the new version number
-
-
-
+                    grunt.util.spawn({
+                        cmd: 'xmlstarlet',
+                        args: ['ed', '-L', '-t', '-u', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", '-v', new_version, file]
+                    }, function(err, result, code) {
+                        if (err) {
+                            grunt.log.writeln('Error while trying to update the file %s, please re-check the file format', file);
+                            done(false);
+                            throw err;
+                        }
+                        grunt.log.writeln('Version updated to %s', new_version);
+                    });
                 } else {
                     grunt.log.writeln('Invalid version format found in the plist file: %s', result);
                 }
