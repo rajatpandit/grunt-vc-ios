@@ -31,7 +31,7 @@ module.exports = function(grunt) {
 
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
-  grunt.registerTask('ios', 'Updates ios info.plist and changes application version. written for environments where plistbuddy is to available', function(file, bump_type) {
+  grunt.registerTask('ios', 'Updates ios info.plist and changes application version. written for environments where plistbuddy is not available', function(file, bump_type) {
       grunt.log.writeln('Called from the ios task');
       var done = this.async(), new_version = '';
       // sed -e '/CFBundleVersion/N' -e "s/\(CFBundleVersion.*<string>\).*\(<\/string>\)/\1${BUILD_NUMBER}\2/"
