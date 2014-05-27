@@ -1,7 +1,7 @@
 {
   "name": "grunt-vc-ios",
-  "description": "Updates ios info.plist and changes application version. written for environments where plistbuddy is not available'",
-  "version": "0.0.2",
+  "description": "Updates ios info.plist and changes application version. Supports nightly increment and also support for semver. Written for environments where plistbuddy is not available'",
+  "version": "0.0.3",
   "homepage": "https://github.com/rajatpandit/grunt-vc-ios",
   "author": {
     "name": "Rajat Pandit",
