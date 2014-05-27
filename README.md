@@ -14,7 +14,7 @@ npm install grunt-vs-ios --save-dev
 Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
 ```js
-grunt.loadNpmTasks('grunt-vs-ios');
+grunt.loadNpmTasks('grunt-vc-ios');
 ```
 
 ## The "ios" task
@@ -24,27 +24,34 @@ In your project's Gruntfile, add a section named `vs_ios` to the data object pas
 
 ```js
 grunt.initConfig({
-  vs_ios: {
+  ios: {
     options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
+      mode: 'nightly' // the other option is to use semver which will update the version using semver
     },
   },
 });
 ```
 ### Usage Examples
+## Using the nightly mode
+
 ```bash
-> grunt ios:Info.plist:patch
-Running "ios:Info.plist:patch" (ios) task
-Called from the ios task
-Current version: 0.0.4
-Updating version to 0.0.5
+> grunt ios:Info.plist:build1237
+Running "ios:Info.plist:build1237" (ios) task
+Processing the request using composing for file Info.plist
+Current version found to be 0.0.1+build1236
+The new version is 0.0.1+build1237
 ```
+## Using the semver mode
+```
+[rp@sodium grunt-vc-ios (master ✗)]$ grunt ios:Info.plist:patch
+Running "ios:Info.plist:patch" (ios) task
+Processing the request using composing for file Info.plist
+Current version found to be 0.0.1+build1237
+The new version is 0.0.2
+```
+
 Check out documentation for semver  to see the options that can be passed
 
 ## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
