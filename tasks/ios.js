@@ -16,6 +16,8 @@ module.exports = function(grunt) {
         options             = this.options(),
         semver              = require('semver'),
         async               = require('async'),
+        // writes the new version in the info.plist file
+        //
         write_version       = function (input, callback) {
             var new_version = '';
             switch(input.mode) {
@@ -32,25 +34,41 @@ module.exports = function(grunt) {
                     new_version = bump_as_nightly(input.version, bump_type); // in this case it will be what is passed via jenkins
                     break;
             }
-            callback(null, new_version);
+            grunt.log.writeln('The new version is %s', new_version);
+            // update the file
+            grunt.util.spawn({
+                cmd: 'xmlstarlet',
+                args: ['ed', '-L', '-t', '-u', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", '-v', new_version, input.file]
+            },function(err, result, code) {
+                if (err) {
+                    callback(err);
+                }
+                callback(null, new_version);
+                done();
+            });
         },
 
+        // updates the version number by adding the
+        // build number as part of the version number
         bump_as_nightly = function(version, build) {
+            version = semver.clean(version);
             return version + '+' + build;
         },
 
+        // update the version using semver
         bump_as_semver = function(version, build) {
             var new_version = -1; // return -1 if the version number isn't valid
-            if (semver.valid(version)) {
-                version = semver.clean(version); // remove any nightly build info
-                new_version = semver.inc(version, build);
-            }
+            version = semver.clean(version); // remove any nightly build info
+            new_version = semver.inc(version, build);
+
             return new_version;
         },
 
+        // get the version current stored in the info.plist
+        // file
         read_version = function (input, callback) {
             grunt.util.spawn({
-                cmd: '/usr/local/bin/xmlstarlet',
+                cmd: 'xmlstarlet',
                 args: ['sel', '-t', '-v', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", input.file]
             },function (err, result, code) {
                 if (err) {
