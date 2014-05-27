@@ -7,75 +7,67 @@
  */
 
 'use strict';
-var fs = require('fs'), semver = require('semver');
-// adding contains method to emulate inarray
-// http://stackoverflow.com/questions/11286979/how-to-search-in-an-array-in-node-js-in-a-non-blocking-way
-// didn't want to add a complete library just for a single function
-Array.prototype.contains = function(k, callback) {
-    var self = this;
-    return (function check(i) {
-        if (i >= self.length) {
-            return callback(false);
-        }
-
-        if (self[i] === k) {
-            return callback(true);
-        }
-
-        return process.nextTick(check.bind(null, i+1));
-    }(0));
-};
-
 
 module.exports = function(grunt) {
+    grunt.registerTask('ios', 'Updates ios info.plist and changes application version. written for environments where plistbuddy is not available', function(file, bump_type) {
+    grunt.log.writeln('Processing the request using composing for file %s', file);
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
-  grunt.registerTask('ios', 'Updates ios info.plist and changes application version. written for environments where plistbuddy is not available', function(file, bump_type) {
-      grunt.log.writeln('Called from the ios task');
-      var done = this.async(), new_version = '';
-      // sed -e '/CFBundleVersion/N' -e "s/\(CFBundleVersion.*<string>\).*\(<\/string>\)/\1${BUILD_NUMBER}\2/"
-      grunt.util.spawn({
-          cmd: 'xmlstarlet',
-          args: ['sel', '-t', '-v', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", file]
-      }, function(err, result, code) {
-        if (err) {
-            grunt.log.writeln('Unable to locate the version number for the bundle, bailing out');
-            done(false);
-            throw err; // TODO improve error handling
+    var done = this.async(), options = this.options(), semver = require('semver'), async = require('async');
+    function write_version(input, callback) {
+        var new_version = '';
+        switch(input.mode) {
+            case 'nightly':
+                // returns back concatinated string back for version
+                new_version = bump_as_nightly(input.version, bump_type); // in this case it will be what is passed via jenkins
+                break;
+            case 'semver':
+                // calls semver for new version number
+                new_version = bump_as_semver(input.version, bump_type);
+                break;
+            default:
+                // default to nightly
+                new_version = bump_as_nightly(input.version, bump_type); // in this case it will be what is passed via jenkins
+                break;
         }
-        // get the version and bump up the version
-        grunt.log.writeln('Current version: ' + result);
-        if ('' === result) {
-            grunt.log.writeln('No version was found in the in the plist file. Please validate the format');
+        callback(null, new_version);
+    }
+
+    var bump_as_nightly = function(version, build) {
+        return version + '+' + build;
+    };
+
+    var bump_as_semver = function(version, build) {
+        var new_version = -1; // return -1 if the version number isn't valid
+        if (semver.valid(version)) {
+            version = semver.clean(version); // remove any nightly build info
+            new_version = semver.inc(version, build);
         }
-        var valid_bump_type = ['major', 'minor', 'patch', 'prerelease'];
-        valid_bump_type.contains(bump_type, function(found) {
-            if (true === found) {
-                result = result.toString(); // convert this into a string value to keep semver happy
-                if (semver.valid(result)) {
-                    new_version = semver.inc(result, bump_type);
-                    grunt.log.writeln('Updating version to %s', new_version);
-                    // update the file with the new version number
-                    grunt.util.spawn({
-                        cmd: 'xmlstarlet',
-                        args: ['ed', '-L', '-t', '-u', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", '-v', new_version, file]
-                    }, function(err, result, code) {
-                        if (err) {
-                            grunt.log.writeln('Error while trying to update the file %s, please re-check the file format', file);
-                            done(false);
-                            throw err;
-                        }
-                        grunt.log.writeln('Version updated to %s', new_version);
-                    });
-                } else {
-                    grunt.log.writeln('Invalid version format found in the plist file: %s', result);
-                }
-            } else {
-                grunt.log.writeln('Invalid bump type value passed, please check semver documentation to see the allowed values');
+        return new_version;
+    };
+
+    var read_version = function (input, callback) {
+        grunt.util.spawn({
+            cmd: '/usr/local/bin/xmlstarlet',
+            args: ['sel', '-t', '-v', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", input.file]
+        },function (err, result, code) {
+            if (err) {
+                callback(err); // callback with the error object
+                done();
             }
+            grunt.log.writeln('Current version found to be %s', result);
+            callback(null, {
+                version : result.toString(),
+                file    : input.file,
+                mode    : input.mode
+            });
+            done();
         });
-        done();
-      });
+    };
+
+   // compose the functions
+   var update_version = async.compose(write_version, read_version);
+       update_version({file: file, mode: options.mode, bump_type: bump_type}, function(err, result) {
+           grunt.log.writeln('The version is now updated to %s', result.toString()); //
+       });
   });
 };
