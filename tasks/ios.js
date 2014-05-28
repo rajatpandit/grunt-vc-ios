@@ -75,9 +75,10 @@ module.exports = function(grunt) {
                     callback(err); // callback with the error object
                     done();
                 }
-                grunt.log.writeln('Current version found to be %s', result);
+                result = String(result);
+                grunt.log.writeln('Current version: %s', result);
                 callback(null, {
-                    version : result.toString(),
+                    version : result,
                     file    : input.file,
                     mode    : input.mode
                 });

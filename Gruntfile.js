@@ -16,7 +16,7 @@ module.exports = function(grunt) {
     // Configuration to be run (and then tested).
     ios: {
         options: {
-            mode: "semver" // this could also be semver
+            mode: "nightly" // this could also be semver
         }
     },
 
