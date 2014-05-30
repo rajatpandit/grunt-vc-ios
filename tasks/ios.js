@@ -10,8 +10,6 @@
 
 module.exports = function(grunt) {
     grunt.registerTask('ios', 'Updates ios info.plist and changes application version. written for environments where plistbuddy is not available', function(file, bump_type) {
-    grunt.log.writeln('Processing the request using composing for file %s', file);
-
     var done                = this.async(),
         options             = this.options(),
         semver              = require('semver'),
@@ -38,7 +36,7 @@ module.exports = function(grunt) {
             // update the file
             grunt.util.spawn({
                 cmd: 'xmlstarlet',
-                args: ['ed', '-L', '-t', '-u', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", '-v', new_version, input.file]
+                args: ['ed', '-q', '-L', '-t', '-u', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", '-v', new_version, input.file]
             },function(err, result, code) {
                 if (err) {
                     callback(err);
@@ -69,7 +67,7 @@ module.exports = function(grunt) {
         read_version = function (input, callback) {
             grunt.util.spawn({
                 cmd: 'xmlstarlet',
-                args: ['sel', '-t', '-v', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", input.file]
+                args: ['sel', '-q', '-t', '-v', "//key[contains(text(),'CFBundleVersion')]/following-sibling::string[1]/text()", input.file]
             },function (err, result, code) {
                 if (err) {
                     callback(err); // callback with the error object
