@@ -36,7 +36,7 @@ module.exports = function(grunt) {
             // update the file
             grunt.util.spawn({
                 cmd: 'xmlstarlet',
-                args: ['ed', '-q', '-L', '-t', '-u', "//key[contains(text(),\"CFBundleVersion\")]/following-sibling::string[1]/text()", '-v', new_version, input.file]
+                args: ['ed', '--inplace', '-u', "//key[contains(text(),\"CFBundleVersion\")]/following-sibling::string[1]/text()", '-v', new_version, input.file]
             },function(err, result, code) {
                 if (err) {
                     callback(err);
