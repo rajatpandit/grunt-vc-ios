@@ -42,7 +42,7 @@ module.exports = function(grunt) {
                     callback(err);
                 }
                 callback(null, new_version);
-                done();
+                // done();
             });
         },
 
@@ -80,7 +80,7 @@ module.exports = function(grunt) {
                     file    : input.file,
                     mode    : input.mode
                 });
-                done();
+                // done();
             });
         },
 
