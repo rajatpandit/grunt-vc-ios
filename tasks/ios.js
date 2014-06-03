@@ -14,6 +14,7 @@ module.exports = function(grunt) {
         options             = this.options(),
         semver              = require('semver'),
         async               = require('async'),
+        fs                  = require('fs'),
         // writes the new version in the info.plist file
         //
         write_version       = function (input, callback) {
@@ -41,6 +42,10 @@ module.exports = function(grunt) {
                 if (err) {
                     callback(err);
                 }
+                // write the information to the disk
+                // this was added as grunt-vc-apprepo needs to know the version of the
+                // build to add to the manifest.plist file
+                fs.writeFileSync('.version', 'VERSION=' + new_version.trim());
                 callback(null, new_version);
                 // done();
             });
